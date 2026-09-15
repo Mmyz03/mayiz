@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { X, ExternalLink, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { ProjectDetail } from '../types';
 import { GitHubIcon } from './Icons';
@@ -10,6 +10,8 @@ interface ProjectDetailModalProps {
   onClose: () => void;
 }
 
+const ANIMATION_DURATION = 700;
+
 export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
   project,
   onClose,
@@ -17,56 +19,63 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
   const [status, setStatus] = useState<ModalStatus>(project ? 'opening' : 'closed');
   const [activeProject, setActiveProject] = useState<ProjectDetail | null>(project);
   const timerRef = useRef<number | null>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
-  // Synchronize when project prop changes from parent
-  useEffect(() => {
-    if (project) {
-      // User clicked a project card
-      setActiveProject(project);
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-        timerRef.current = null;
-      }
-      setStatus('opening');
-      timerRef.current = window.setTimeout(() => {
-        setStatus('open');
-        timerRef.current = null;
-      }, 720);
-    } else if (status === 'open' || status === 'opening') {
-      // Parent triggered close externally
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-      }
-      setStatus('closing');
-      timerRef.current = window.setTimeout(() => {
-        setStatus('closed');
-        setActiveProject(null);
-        timerRef.current = null;
-        onClose();
-      }, 720);
-    }
-  }, [project]);
+  const lockBodyScroll = () => {
+    document.body.style.overflow = 'hidden';
+  };
 
-  // Handle close action (from X button, close button, backdrop, or escape)
-  const triggerClose = () => {
+  const unlockBodyScroll = () => {
+    document.body.style.overflow = '';
+  };
+
+  // Handle close action: immediately unlock body scroll so user's first swipe works natively
+  const triggerClose = useCallback(() => {
     if (status === 'closing' || status === 'closed') return;
+
+    // 1. Immediately unlock body scroll so native scrolling is enabled on the very first touch
+    unlockBodyScroll();
+
+    // 2. Set status to closing to trigger reverse CSS animations and pointer-events: none
     setStatus('closing');
+
     if (timerRef.current) {
       clearTimeout(timerRef.current);
     }
-    // Hold component mounted during the entire 720ms reverse animation
+
+    // 3. Keep mounted for the full animation duration, then clean up state
     timerRef.current = window.setTimeout(() => {
       setStatus('closed');
       setActiveProject(null);
       timerRef.current = null;
-      onClose();
-    }, 720);
-  };
+      onCloseRef.current();
+    }, ANIMATION_DURATION);
+  }, [status]);
 
-  // Lock body scroll stably without layout thrashing while modal is mounted
-  const isModalMounted = Boolean(activeProject && status !== 'closed');
+  // Synchronize when project prop changes from parent
   useEffect(() => {
-    if (!isModalMounted) return;
+    if (project) {
+      // User opened a project
+      setActiveProject(project);
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+      lockBodyScroll();
+      setStatus('opening');
+      timerRef.current = window.setTimeout(() => {
+        setStatus('open');
+        timerRef.current = null;
+      }, ANIMATION_DURATION);
+    } else if (status === 'open' || status === 'opening') {
+      // Parent triggered close externally
+      triggerClose();
+    }
+  }, [project]);
+
+  // Escape key handler
+  useEffect(() => {
+    if (status !== 'open' && status !== 'opening') return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -74,22 +83,19 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
       }
     };
 
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
     window.addEventListener('keydown', handleKeyDown);
-
     return () => {
-      document.body.style.overflow = originalOverflow;
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isModalMounted]);
+  }, [status, triggerClose]);
 
-  // Clean up any pending timer on unmount
+  // Clean up on unmount
   useEffect(() => {
     return () => {
       if (timerRef.current) {
         clearTimeout(timerRef.current);
       }
+      unlockBodyScroll();
     };
   }, []);
 

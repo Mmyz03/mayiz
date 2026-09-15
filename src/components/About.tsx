@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { MascotIllustration } from './MascotIllustration';
+import { useTargetPetals, CardPetalsLayer } from './SectionPetals';
 
 interface DashboardItem {
   label: string;
@@ -28,6 +29,26 @@ const DASHBOARD_ROWS: DashboardItem[] = [
     value: 'Projects · Collaboration · Opportunities',
   },
 ];
+
+const DashboardRowItem: React.FC<{ row: DashboardItem }> = ({ row }) => {
+  const { activePetals, touchProps } = useTargetPetals({ fallDistance: 'compact' });
+
+  return (
+    <div
+      className="dashboard-row"
+      style={{ position: 'relative' }}
+      {...touchProps}
+    >
+      <CardPetalsLayer petals={activePetals} />
+      <div className="dashboard-row-label">
+        {row.label}
+      </div>
+      <div className="dashboard-row-value">
+        <span>{row.value}</span>
+      </div>
+    </div>
+  );
+};
 
 export const About: React.FC = () => {
   const [isHolding, setIsHolding] = useState(false);
@@ -101,14 +122,7 @@ export const About: React.FC = () => {
 
             <div className="dashboard-rows">
               {DASHBOARD_ROWS.map((row) => (
-                <div key={row.label} className="dashboard-row">
-                  <div className="dashboard-row-label">
-                    {row.label}
-                  </div>
-                  <div className="dashboard-row-value">
-                    <span>{row.value}</span>
-                  </div>
-                </div>
+                <DashboardRowItem key={row.label} row={row} />
               ))}
             </div>
           </div>

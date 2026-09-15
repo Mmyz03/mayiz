@@ -2,6 +2,7 @@ import React from 'react';
 import { Project } from '../types';
 import { GitHubIcon } from './Icons';
 import { SKILL_PROJECT_MAP } from '../data/skills';
+import { useTargetPetals, CardPetalsLayer } from './SectionPetals';
 
 interface ProjectCardProps {
   project: Project;
@@ -14,6 +15,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
   activeTech,
   onOpenDetails,
 }) => {
+  const { activePetals, touchProps } = useTargetPetals();
   const isMatch = activeTech
     ? (SKILL_PROJECT_MAP[activeTech]?.some(
         (p) => p.toLowerCase() === project.name.toLowerCase()
@@ -76,7 +78,10 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
           onOpenDetails?.();
         }
       }}
+      style={{ position: 'relative' }}
+      {...touchProps}
     >
+      <CardPetalsLayer petals={activePetals} />
       <div className="project-top-row">
         <div className="project-header">
           <div className="project-name-tagline-wrap">

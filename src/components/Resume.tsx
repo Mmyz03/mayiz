@@ -1,16 +1,19 @@
 import React from 'react';
 import { ExternalLink, Download } from 'lucide-react';
 import { MagneticButton } from './MagneticButton';
+import { useTargetPetals, CardPetalsLayer } from './SectionPetals';
 
 export const Resume: React.FC = () => {
   // Same-origin relative path to static PDF asset in public directory
   const resumeAssetUrl = `${import.meta.env.BASE_URL}Mayiz's%20Resume.pdf`;
   const resumeFileName = "Mayiz's Resume.pdf";
+  const { activePetals, touchProps } = useTargetPetals();
 
   return (
     <section id="resume" className="resume-section">
       <div className="container">
-        <div className="resume-card">
+        <div className="resume-card" style={{ position: 'relative' }} {...touchProps}>
+          <CardPetalsLayer petals={activePetals} />
           <div className="resume-content-group">
             <h2 className="resume-heading">Resume</h2>
             <p className="resume-supporting-text">
