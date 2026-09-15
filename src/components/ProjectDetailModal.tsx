@@ -31,7 +31,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
       timerRef.current = window.setTimeout(() => {
         setStatus('open');
         timerRef.current = null;
-      }, 450);
+      }, 720);
     } else if (status === 'open' || status === 'opening') {
       // Parent triggered close externally
       if (timerRef.current) {
@@ -42,7 +42,8 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
         setStatus('closed');
         setActiveProject(null);
         timerRef.current = null;
-      }, 450);
+        onClose();
+      }, 720);
     }
   }, [project]);
 
@@ -53,18 +54,19 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
     if (timerRef.current) {
       clearTimeout(timerRef.current);
     }
-    // Hold component mounted during the entire 450ms reverse animation
+    // Hold component mounted during the entire 720ms reverse animation
     timerRef.current = window.setTimeout(() => {
       setStatus('closed');
       setActiveProject(null);
       timerRef.current = null;
       onClose();
-    }, 450);
+    }, 720);
   };
 
-  // Lock body scroll while modal is visible in any state
+  // Lock body scroll stably without layout thrashing while modal is mounted
+  const isModalMounted = Boolean(activeProject && status !== 'closed');
   useEffect(() => {
-    if (status === 'closed') return;
+    if (!isModalMounted) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -80,7 +82,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
       document.body.style.overflow = originalOverflow;
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [status]);
+  }, [isModalMounted]);
 
   // Clean up any pending timer on unmount
   useEffect(() => {
@@ -136,17 +138,6 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
           </div>
 
           <div className="modal-header-actions">
-            <a
-              href={activeProject.githubUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="modal-github-icon-btn"
-              aria-label={`Open ${activeProject.name} repository on GitHub`}
-              title="View on GitHub"
-            >
-              <GitHubIcon size={18} />
-            </a>
-
             <button
               type="button"
               className="modal-close-btn"

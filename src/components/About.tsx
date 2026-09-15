@@ -32,9 +32,8 @@ const DASHBOARD_ROWS: DashboardItem[] = [
 export const About: React.FC = () => {
   const [isHolding, setIsHolding] = useState(false);
 
-  const handlePointerDown = useCallback((e: React.PointerEvent) => {
-    // Trigger touch-and-hold for touch pointers or touch devices
-    if (e.pointerType === 'touch' || (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(pointer: coarse)').matches)) {
+  const handlePointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.pointerType === 'touch' || e.pointerType === 'pen') {
       setIsHolding(true);
     }
   }, []);
@@ -52,9 +51,7 @@ export const About: React.FC = () => {
   }, []);
 
   const handleContextMenu = useCallback((e: React.MouseEvent) => {
-    if (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(pointer: coarse)').matches) {
-      e.preventDefault();
-    }
+    e.preventDefault();
   }, []);
 
   return (
@@ -74,9 +71,6 @@ export const About: React.FC = () => {
           onPointerLeave={handlePointerLeave}
           onContextMenu={handleContextMenu}
         >
-          {/* Dedicated Transparent Interaction Layer covering the ENTIRE About card */}
-          <div className="about-interaction-layer" aria-hidden="true" />
-
           {/* Visual Content Layer */}
           <div className="about-text-content">
             <p className="about-paragraph">
