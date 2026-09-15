@@ -84,6 +84,7 @@ body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
   overflow-x: hidden;
+  scrollbar-gutter: stable;
   cursor: auto;
 }
 
@@ -2066,102 +2067,90 @@ a {
   position: fixed;
   inset: 0;
   z-index: 2000;
-  background-color: rgba(24, 18, 20, 0.48);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background-color: rgba(18, 14, 16, 0.68);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 1.5rem;
-  will-change: opacity;
+  opacity: 0;
+  pointer-events: none;
   transform: translateZ(0);
+  will-change: opacity;
+  transition: opacity 0.78s cubic-bezier(0.22, 1, 0.36, 1);
   overscroll-behavior: contain;
 }
 
-.project-modal-backdrop.modal-status-opening {
-  animation: modalBackdropIn 0.70s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-.project-modal-backdrop.modal-status-open {
+.project-modal-backdrop.is-open {
   opacity: 1;
+  pointer-events: auto;
 }
 
-.project-modal-backdrop.modal-status-closing,
 .project-modal-backdrop.is-closing {
+  opacity: 0;
   pointer-events: none !important;
-  animation: modalBackdropOut 0.70s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  transition: opacity 0.78s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-@keyframes modalBackdropIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-@keyframes modalBackdropOut {
-  0% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
+.project-modal-backdrop.is-closing * {
+  pointer-events: none !important;
 }
 
 .project-modal-container {
   background: var(--bg-surface);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-lg);
-  box-shadow: 0 20px 48px rgba(40, 20, 25, 0.18), 0 0 0 1px rgba(37, 99, 235, 0.12);
+  box-shadow: 0 24px 54px rgba(40, 20, 25, 0.20), 0 0 0 1px rgba(37, 99, 235, 0.12);
   width: 100%;
   max-width: 680px;
   max-height: 88vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  will-change: transform, opacity;
-  transform: translateZ(0);
   position: relative;
   overscroll-behavior: contain;
+  transform: translate3d(0, 16px, 0) scale(0.96) translateZ(0);
+  transform-origin: center center;
+  opacity: 0;
+  will-change: transform, opacity;
+  transition: transform 0.78s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 0.78s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.project-modal-container.modal-status-opening {
-  animation: modalContainerUnfold 0.70s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-.project-modal-container.modal-status-open {
+.project-modal-backdrop.is-open .project-modal-container {
+  transform: translate3d(0, 0, 0) scale(1) translateZ(0);
   opacity: 1;
-  transform: translate3d(0, 0, 0) scale(1);
 }
 
-.project-modal-container.modal-status-closing,
-.project-modal-container.is-closing {
+.project-modal-backdrop.is-closing .project-modal-container {
+  transform: translate3d(0, 16px, 0) scale(0.96) translateZ(0);
+  opacity: 0;
   pointer-events: none !important;
-  animation: modalContainerFold 0.70s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  transition: transform 0.78s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 0.78s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-@keyframes modalContainerUnfold {
-  0% {
-    opacity: 0;
-    transform: translate3d(0, 18px, 0) scale(0.97);
-  }
-  100% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
-  }
+/* Staggered Inner Content Reveal on Open, Gentle Dissolve on Close */
+.project-modal-body,
+.project-modal-footer {
+  transform: translate3d(0, 8px, 0);
+  opacity: 0;
+  will-change: transform, opacity;
+  transition: transform 0.52s cubic-bezier(0.22, 1, 0.36, 1) 0.12s,
+              opacity 0.52s cubic-bezier(0.22, 1, 0.36, 1) 0.12s;
 }
 
-@keyframes modalContainerFold {
-  0% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: translate3d(0, 18px, 0) scale(0.97);
-  }
+.project-modal-backdrop.is-open .project-modal-body,
+.project-modal-backdrop.is-open .project-modal-footer {
+  transform: translate3d(0, 0, 0);
+  opacity: 1;
+}
+
+.project-modal-backdrop.is-closing .project-modal-body,
+.project-modal-backdrop.is-closing .project-modal-footer {
+  transform: translate3d(0, 6px, 0);
+  opacity: 0;
+  transition: transform 0.32s cubic-bezier(0.25, 1, 0.5, 1) 0s,
+              opacity 0.32s cubic-bezier(0.25, 1, 0.5, 1) 0s;
 }
 
 .project-modal-header {
@@ -2297,6 +2286,7 @@ a {
   display: flex;
   flex-direction: column;
   gap: 1.4rem;
+  scrollbar-gutter: stable;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2327,14 +2317,11 @@ a {
   }
 
   .project-modal-backdrop,
-  .project-modal-backdrop.modal-status-opening,
-  .project-modal-backdrop.modal-status-closing,
-  .project-modal-backdrop.is-closing,
   .project-modal-container,
-  .project-modal-container.modal-status-opening,
-  .project-modal-container.modal-status-closing,
-  .project-modal-container.is-closing {
-    animation-duration: 0.05s !important;
+  .project-modal-body,
+  .project-modal-footer {
+    transition-duration: 0.01s !important;
+    transition-delay: 0s !important;
   }
 }
 

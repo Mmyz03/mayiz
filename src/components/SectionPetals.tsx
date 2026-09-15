@@ -118,7 +118,6 @@ export function useTargetPetals(options?: TargetPetalsOptions) {
     const duration = performance.now() - touchStateRef.current.startTime;
     // Strictly verify intentional direct tap (< 8px movement and < 800ms duration)
     if (dist <= 8 && duration < 800) {
-      e.stopPropagation();
       triggerPetals();
     }
     touchStateRef.current.isCancelled = true;

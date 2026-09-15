@@ -3,22 +3,23 @@ import { X, ExternalLink, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { ProjectDetail } from '../types';
 import { GitHubIcon } from './Icons';
 
-export type ModalStatus = 'closed' | 'opening' | 'open' | 'closing';
-
 interface ProjectDetailModalProps {
   project: ProjectDetail | null;
   onClose: () => void;
 }
 
-const ANIMATION_DURATION = 700;
+const ANIMATION_DURATION = 780;
 
 export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
   project,
   onClose,
 }) => {
-  const [status, setStatus] = useState<ModalStatus>(project ? 'opening' : 'closed');
   const [activeProject, setActiveProject] = useState<ProjectDetail | null>(project);
-  const timerRef = useRef<number | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+  const closeTimerRef = useRef<number | null>(null);
+  const openRafRef = useRef<number | null>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
 
@@ -32,50 +33,64 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
 
   // Handle close action: immediately unlock body scroll so user's first swipe works natively
   const triggerClose = useCallback(() => {
-    if (status === 'closing' || status === 'closed') return;
+    if (isClosing) return;
 
     // 1. Immediately unlock body scroll so native scrolling is enabled on the very first touch
     unlockBodyScroll();
 
-    // 2. Set status to closing to trigger reverse CSS animations and pointer-events: none
-    setStatus('closing');
+    // 2. Set closing state
+    setIsClosing(true);
+    setIsOpen(false);
 
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
+    // 3. Immediately notify parent to reset selected project state so re-clicking the same project works instantly
+    onCloseRef.current();
+
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
     }
 
-    // 3. Keep mounted for the full animation duration, then clean up state
-    timerRef.current = window.setTimeout(() => {
-      setStatus('closed');
+    // 4. Keep modal mounted for the full animation duration, then clean up state
+    closeTimerRef.current = window.setTimeout(() => {
+      setIsClosing(false);
       setActiveProject(null);
-      timerRef.current = null;
-      onCloseRef.current();
+      closeTimerRef.current = null;
     }, ANIMATION_DURATION);
-  }, [status]);
+  }, [isClosing]);
 
   // Synchronize when project prop changes from parent
   useEffect(() => {
     if (project) {
       // User opened a project
-      setActiveProject(project);
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
+      if (closeTimerRef.current) {
+        clearTimeout(closeTimerRef.current);
+        closeTimerRef.current = null;
       }
+      setIsClosing(false);
+      setActiveProject(project);
       lockBodyScroll();
-      setStatus('opening');
-      timerRef.current = window.setTimeout(() => {
-        setStatus('open');
-        timerRef.current = null;
-      }, ANIMATION_DURATION);
-    } else if (status === 'open' || status === 'opening') {
-      // Parent triggered close externally
+
+      // Reset scroll position to top whenever a project opens
+      if (bodyRef.current) {
+        bodyRef.current.scrollTop = 0;
+      }
+
+      // Double rAF ensures the browser renders the initial resting state before initiating transition
+      if (openRafRef.current) {
+        cancelAnimationFrame(openRafRef.current);
+      }
+      openRafRef.current = requestAnimationFrame(() => {
+        openRafRef.current = requestAnimationFrame(() => {
+          setIsOpen(true);
+        });
+      });
+    } else if (activeProject && !isClosing) {
       triggerClose();
     }
   }, [project]);
 
   // Escape key handler
   useEffect(() => {
-    if (status !== 'open' && status !== 'opening') return;
+    if (!isOpen || isClosing) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -87,30 +102,35 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [status, triggerClose]);
+  }, [isOpen, isClosing, triggerClose]);
 
   // Clean up on unmount
   useEffect(() => {
     return () => {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
+      if (closeTimerRef.current) {
+        clearTimeout(closeTimerRef.current);
+      }
+      if (openRafRef.current) {
+        cancelAnimationFrame(openRafRef.current);
       }
       unlockBodyScroll();
     };
   }, []);
 
-  if (status === 'closed' || !activeProject) return null;
+  if (!activeProject) return null;
+
+  const stateClass = isClosing ? 'is-closing' : isOpen ? 'is-open' : 'is-opening';
 
   return (
     <div
-      className={`project-modal-backdrop modal-status-${status}`}
+      className={`project-modal-backdrop ${stateClass}`}
       onClick={triggerClose}
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-project-title"
     >
       <div
-        className={`project-modal-container modal-status-${status}`}
+        className={`project-modal-container ${stateClass}`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Header Bar */}
@@ -155,8 +175,8 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
           </div>
         </div>
 
-        {/* Scrollable Content Area with Smooth Crossfade on project switch */}
-        <div className="project-modal-body" key={activeProject.id}>
+        {/* Scrollable Content Area with Unified Smooth Transition */}
+        <div className="project-modal-body" ref={bodyRef}>
           {/* Section: WHAT IT IS */}
           <div className="modal-section-block">
             <h4 className="modal-section-heading">WHAT IT IS</h4>
