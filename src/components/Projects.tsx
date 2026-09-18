@@ -23,12 +23,12 @@ export const Projects: React.FC<ProjectsProps> = ({
   return (
     <section id="projects" className="projects-section">
       <div className="container">
-        <h2 className="section-title">
+        <h2 className="section-title reveal-item">
           <span>Projects</span>
         </h2>
 
         {/* Flagship Major Final-Year Project: I-HEART */}
-        <div className="flagship-project-wrapper">
+        <div className="flagship-project-wrapper reveal-item reveal-delay-1">
           <IHeartFlagship
             activeTech={activeTech}
             onOpenDetails={() => setSelectedProjectId('i-heart')}
@@ -37,18 +37,19 @@ export const Projects: React.FC<ProjectsProps> = ({
 
         {/* Other Supporting Projects */}
         <div className="other-projects-section">
-          <div className="other-projects-header">
+          <div className="other-projects-header reveal-item">
             <span className="other-projects-label">OTHER PROJECTS</span>
             <span className="other-projects-line" aria-hidden="true" />
           </div>
 
           <div className="projects-list">
-            {projects.map((project) => (
+            {projects.map((project, idx) => (
               <ProjectCard
                 key={project.id}
                 project={project}
                 activeTech={activeTech}
                 onOpenDetails={() => setSelectedProjectId(project.id)}
+                index={idx}
               />
             ))}
           </div>

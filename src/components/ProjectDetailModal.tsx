@@ -8,7 +8,7 @@ interface ProjectDetailModalProps {
   onClose: () => void;
 }
 
-const ANIMATION_DURATION = 780;
+const ANIMATION_DURATION = 820;
 
 export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
   project,
@@ -19,7 +19,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
   const [isClosing, setIsClosing] = useState(false);
   const closeTimerRef = useRef<number | null>(null);
   const openRafRef = useRef<number | null>(null);
-  const bodyRef = useRef<HTMLDivElement>(null);
+  const backdropRef = useRef<HTMLDivElement>(null);
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
 
@@ -70,8 +70,8 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
       lockBodyScroll();
 
       // Reset scroll position to top whenever a project opens
-      if (bodyRef.current) {
-        bodyRef.current.scrollTop = 0;
+      if (backdropRef.current) {
+        backdropRef.current.scrollTop = 0;
       }
 
       // Double rAF ensures the browser renders the initial resting state before initiating transition
@@ -123,6 +123,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
 
   return (
     <div
+      ref={backdropRef}
       className={`project-modal-backdrop ${stateClass}`}
       onClick={triggerClose}
       role="dialog"
@@ -175,8 +176,8 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
           </div>
         </div>
 
-        {/* Scrollable Content Area with Unified Smooth Transition */}
-        <div className="project-modal-body" ref={bodyRef}>
+        {/* Content Area with Unified Smooth Transition */}
+        <div className="project-modal-body">
           {/* Section: WHAT IT IS */}
           <div className="modal-section-block">
             <h4 className="modal-section-heading">WHAT IT IS</h4>

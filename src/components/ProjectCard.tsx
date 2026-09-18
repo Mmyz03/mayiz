@@ -2,20 +2,20 @@ import React from 'react';
 import { Project } from '../types';
 import { GitHubIcon } from './Icons';
 import { SKILL_PROJECT_MAP } from '../data/skills';
-import { useTargetPetals, CardPetalsLayer } from './SectionPetals';
 
 interface ProjectCardProps {
   project: Project;
   activeTech: string | null;
   onOpenDetails?: () => void;
+  index?: number;
 }
 
 export const ProjectCard: React.FC<ProjectCardProps> = ({
   project,
   activeTech,
   onOpenDetails,
+  index = 0,
 }) => {
-  const { activePetals, touchProps } = useTargetPetals();
   const isMatch = activeTech
     ? (SKILL_PROJECT_MAP[activeTech]?.some(
         (p) => p.toLowerCase() === project.name.toLowerCase()
@@ -66,7 +66,9 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
 
   return (
     <article
-      className={`project-item ${isMatch ? 'highlighted' : ''}`}
+      className={`project-item reveal-item reveal-delay-${Math.min(index + 1, 6)} ${
+        isMatch ? 'highlighted' : ''
+      }`}
       id={`project-${project.id}`}
       aria-label={`${project.name} Project Card. Click to view detailed project information.`}
       onClick={() => onOpenDetails?.()}
@@ -78,10 +80,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
           onOpenDetails?.();
         }
       }}
-      style={{ position: 'relative' }}
-      {...touchProps}
     >
-      <CardPetalsLayer petals={activePetals} />
       <div className="project-top-row">
         <div className="project-header">
           <div className="project-name-tagline-wrap">

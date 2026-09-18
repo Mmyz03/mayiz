@@ -11,62 +11,70 @@ export const Footer: React.FC = () => {
         {/* Centered Contact Area */}
         <div className="final-contact-block">
           {/* Heading: Drop a Line */}
-          <h2 className="final-contact-heading">
+          <h2 className="final-contact-heading reveal-item">
             <span className="contact-heading-text">Drop a Line</span>
           </h2>
 
           {/* Description */}
-          <p className="final-contact-desc">
+          <p className="final-contact-desc reveal-item reveal-delay-1">
             Anything you wanna share? Feel free to reach out.
           </p>
 
           {/* Circular Icon Buttons: GitHub, LinkedIn, Discord, Email */}
           <div className="final-social-icons-row" role="list">
-            <MagneticButton
-              strength="weak"
-              href={personalInfo.githubUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="final-circle-icon-btn social-btn-github"
-              aria-label="GitHub Profile"
-              title="GitHub"
-            >
-              <GitHubIcon size={20} className="final-icon-svg social-icon-github" />
-            </MagneticButton>
+            <div className="reveal-item reveal-delay-2">
+              <MagneticButton
+                strength="weak"
+                href={personalInfo.githubUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="final-circle-icon-btn social-btn-github"
+                aria-label="GitHub Profile"
+                title="GitHub"
+              >
+                <GitHubIcon size={20} className="final-icon-svg social-icon-github" />
+              </MagneticButton>
+            </div>
 
-            <MagneticButton
-              strength="weak"
-              href={personalInfo.linkedinUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="final-circle-icon-btn social-btn-linkedin"
-              aria-label="LinkedIn Profile"
-              title="LinkedIn"
-            >
-              <LinkedInIcon size={20} className="final-icon-svg social-icon-linkedin" />
-            </MagneticButton>
+            <div className="reveal-item reveal-delay-3">
+              <MagneticButton
+                strength="weak"
+                href={personalInfo.linkedinUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="final-circle-icon-btn social-btn-linkedin"
+                aria-label="LinkedIn Profile"
+                title="LinkedIn"
+              >
+                <LinkedInIcon size={20} className="final-icon-svg social-icon-linkedin" />
+              </MagneticButton>
+            </div>
 
-            <MagneticButton
-              strength="weak"
-              href={personalInfo.discordUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="final-circle-icon-btn social-btn-discord"
-              aria-label="Discord Profile"
-              title="Discord"
-            >
-              <DiscordIcon size={20} className="final-icon-svg social-icon-discord" />
-            </MagneticButton>
+            <div className="reveal-item reveal-delay-4">
+              <MagneticButton
+                strength="weak"
+                href={personalInfo.discordUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="final-circle-icon-btn social-btn-discord"
+                aria-label="Discord Profile"
+                title="Discord"
+              >
+                <DiscordIcon size={20} className="final-icon-svg social-icon-discord" />
+              </MagneticButton>
+            </div>
 
-            <MagneticButton
-              strength="weak"
-              href={`mailto:${personalInfo.email}`}
-              className="final-circle-icon-btn social-btn-email"
-              aria-label="Send Email"
-              title="Email"
-            >
-              <Mail size={20} className="final-icon-svg social-icon-email" />
-            </MagneticButton>
+            <div className="reveal-item reveal-delay-5">
+              <MagneticButton
+                strength="weak"
+                href={`mailto:${personalInfo.email}`}
+                className="final-circle-icon-btn social-btn-email"
+                aria-label="Send Email"
+                title="Email"
+              >
+                <Mail size={20} className="final-icon-svg social-icon-email" />
+              </MagneticButton>
+            </div>
           </div>
         </div>
 
@@ -74,7 +82,7 @@ export const Footer: React.FC = () => {
         <div className="final-footer-divider" />
 
         {/* Minimal Footer Row: Left (© 2026 Mohammed Mayiz Mohtesham) & Right (bbye — until next time.) */}
-        <div className="final-footer-row">
+        <div className="final-footer-row reveal-item reveal-delay-2">
           <span className="final-footer-copy">
             © 2026 {personalInfo.name}
           </span>

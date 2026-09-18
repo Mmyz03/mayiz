@@ -7,7 +7,6 @@ import { Projects } from './components/Projects';
 import { Resume } from './components/Resume';
 import { Footer } from './components/Footer';
 import { BackToTop } from './components/BackToTop';
-import { FlowerIntro } from './components/FlowerIntro';
 import { projects } from './data/projects';
 import './styles/index.css';
 
@@ -23,10 +22,42 @@ export function App() {
     };
   }, []);
 
+  useEffect(() => {
+    // Lightweight, high-performance scroll reveal engine
+    if (typeof IntersectionObserver === 'undefined') {
+      document.querySelectorAll('.reveal-item').forEach((el) => {
+        el.setAttribute('data-revealed', 'true');
+        el.classList.add('is-revealed');
+      });
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.setAttribute('data-revealed', 'true');
+            entry.target.classList.add('is-revealed');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        threshold: 0.01,
+        rootMargin: '0px 0px 40px 0px',
+      }
+    );
+
+    const elements = document.querySelectorAll('.reveal-item');
+    elements.forEach((el) => observer.observe(el));
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
   return (
     <div className="portfolio-app">
-      {/* First-Session Wind-Carried Flower Petal Intro */}
-      <FlowerIntro />
       <Navbar />
       <main>
         {/* 1. Home */}

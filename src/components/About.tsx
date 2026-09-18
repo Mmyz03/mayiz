@@ -1,6 +1,5 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { MascotIllustration } from './MascotIllustration';
-import { useTargetPetals, CardPetalsLayer } from './SectionPetals';
 
 interface DashboardItem {
   label: string;
@@ -30,16 +29,9 @@ const DASHBOARD_ROWS: DashboardItem[] = [
   },
 ];
 
-const DashboardRowItem: React.FC<{ row: DashboardItem }> = ({ row }) => {
-  const { activePetals, touchProps } = useTargetPetals({ fallDistance: 'compact' });
-
+const DashboardRowItem: React.FC<{ row: DashboardItem; index: number }> = ({ row, index }) => {
   return (
-    <div
-      className="dashboard-row"
-      style={{ position: 'relative' }}
-      {...touchProps}
-    >
-      <CardPetalsLayer petals={activePetals} />
+    <div className={`dashboard-row reveal-item reveal-delay-${Math.min(index + 3, 8)}`}>
       <div className="dashboard-row-label">
         {row.label}
       </div>
@@ -52,6 +44,41 @@ const DashboardRowItem: React.FC<{ row: DashboardItem }> = ({ row }) => {
 
 export const About: React.FC = () => {
   const [isHolding, setIsHolding] = useState(false);
+  const [isRevealed, setIsRevealed] = useState(false);
+  const aboutGridRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (typeof IntersectionObserver === 'undefined') {
+      setIsRevealed(true);
+      return;
+    }
+
+    const targetEl = aboutGridRef.current;
+    if (!targetEl) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsRevealed(true);
+            entry.target.setAttribute('data-revealed', 'true');
+            entry.target.classList.add('is-revealed');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        threshold: 0.01,
+        rootMargin: '0px 0px 40px 0px',
+      }
+    );
+
+    observer.observe(targetEl);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   const handlePointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     if (e.pointerType === 'touch' || e.pointerType === 'pen') {
@@ -79,13 +106,15 @@ export const About: React.FC = () => {
     <section id="about" className="about-section">
       <div className="container">
         {/* ABOUT Heading */}
-        <h2 className="section-title">
+        <h2 className="section-title reveal-item">
           <span>About</span>
         </h2>
 
         {/* ABOUT Content Grid / Card */}
         <div 
-          className={`about-grid ${isHolding ? 'is-touch-holding' : ''}`}
+          ref={aboutGridRef}
+          className={`about-grid reveal-item reveal-delay-1 ${isRevealed ? 'is-revealed' : ''} ${isHolding ? 'is-touch-holding' : ''}`}
+          data-revealed={isRevealed ? 'true' : undefined}
           onPointerDown={handlePointerDown}
           onPointerUp={handlePointerUp}
           onPointerCancel={handlePointerCancel}
@@ -109,7 +138,7 @@ export const About: React.FC = () => {
 
         {/* STATUS & FOCUS Panel */}
         <div className="status-focus-section-wrapper">
-          <div className="dashboard-panel">
+          <div className="dashboard-panel reveal-item reveal-delay-2">
             <div className="dashboard-header">
               <div className="dashboard-title-group">
                 <span className="dashboard-live-dot" />
@@ -121,8 +150,8 @@ export const About: React.FC = () => {
             </div>
 
             <div className="dashboard-rows">
-              {DASHBOARD_ROWS.map((row) => (
-                <DashboardRowItem key={row.label} row={row} />
+              {DASHBOARD_ROWS.map((row, idx) => (
+                <DashboardRowItem key={row.label} row={row} index={idx} />
               ))}
             </div>
           </div>

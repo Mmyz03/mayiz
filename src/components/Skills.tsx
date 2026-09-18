@@ -1,7 +1,6 @@
 import React from 'react';
 import { skillCategories, SKILL_PROJECT_MAP } from '../data/skills';
 import { Sparkles, ArrowRight } from 'lucide-react';
-import { useTargetPetals, CardPetalsLayer } from './SectionPetals';
 
 interface SkillsProps {
   activeTech: string | null;
@@ -12,22 +11,21 @@ interface CategoryCardProps {
   category: { name: string; skills: string[] };
   activeTech: string | null;
   onHoverTech: (tech: string | null) => void;
+  index: number;
 }
 
 const SkillCategoryCard: React.FC<CategoryCardProps> = ({
   category,
   activeTech,
   onHoverTech,
+  index,
 }) => {
-  const { activePetals, touchProps } = useTargetPetals();
-
   return (
     <div
-      className={`skills-category-card ${category.name === 'WEB' ? 'web-category' : ''}`}
-      style={{ position: 'relative' }}
-      {...touchProps}
+      className={`skills-category-card reveal-item reveal-delay-${Math.min(index + 3, 8)} ${
+        category.name === 'WEB' ? 'web-category' : ''
+      }`}
     >
-      <CardPetalsLayer petals={activePetals} />
       <div className="skills-category-header">
         <span className="skills-category-title">{category.name}</span>
       </div>
@@ -65,14 +63,15 @@ export const Skills: React.FC<SkillsProps> = ({ activeTech, onHoverTech }) => {
       <div className="container">
         {/* Section Header */}
         <div className="skills-header-block">
-          <div className="skills-section-tag">WHAT I WORK WITH</div>
-          <h2 className="skills-main-title">What I work with</h2>
-          <p className="skills-subtitle">
+          <h2 className="skills-main-title reveal-item">
+            What I work with
+          </h2>
+          <p className="skills-subtitle reveal-item reveal-delay-1">
             The tools I use to turn ideas into working things.
           </p>
 
           {/* Interactive Project Connection Strip */}
-          <div className="skills-connection-bar" aria-live="polite">
+          <div className="skills-connection-bar reveal-item reveal-delay-2" aria-live="polite">
             {activeTech ? (
               <div className="connection-active">
                 <span className="connection-tech">{activeTech}</span>
@@ -101,12 +100,13 @@ export const Skills: React.FC<SkillsProps> = ({ activeTech, onHoverTech }) => {
 
         {/* Bordered Category Containers Layout */}
         <div className="skills-editorial-grid">
-          {skillCategories.map((category) => (
+          {skillCategories.map((category, idx) => (
             <SkillCategoryCard
               key={category.name}
               category={category}
               activeTech={activeTech}
               onHoverTech={onHoverTech}
+              index={idx}
             />
           ))}
         </div>

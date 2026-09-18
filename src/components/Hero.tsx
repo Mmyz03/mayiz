@@ -21,8 +21,8 @@ export const Hero: React.FC = () => {
     <section id="home" className="hero-editorial-section">
       <div className="container">
         {/* Top Eyebrow Tag */}
-        <div className="hero-eyebrow-row">
-          <span className="hero-eyebrow-text">AI · DATA SCIENCE · DEVELOPMENT</span>
+        <div className="hero-eyebrow-row reveal-item">
+          <span className="hero-eyebrow-text">DATA SCIENCE ENGINEER</span>
           <span className="hero-eyebrow-line" aria-hidden="true" />
         </div>
 
@@ -30,16 +30,16 @@ export const Hero: React.FC = () => {
         <div className="hero-top-row">
           {/* Left Column: Headline, Bio Paragraph, Action Buttons */}
           <div className="hero-main-column">
-            <h1 className="hero-editorial-heading">
+            <h1 className="hero-editorial-heading reveal-item reveal-delay-1">
               Turning curiosity into{' '}
               <span className="headline-serif-italic">code.</span>
             </h1>
 
-            <p className="hero-editorial-bio">
+            <p className="hero-editorial-bio reveal-item reveal-delay-2">
               I build practical software across AI, machine learning, data, and the web — learning by turning ideas into working projects.
             </p>
 
-            <div className="hero-editorial-actions">
+            <div className="hero-editorial-actions reveal-item reveal-delay-3">
               <MagneticButton
                 href="#footer"
                 onClick={(e) => scrollToSection('footer', e)}
@@ -60,7 +60,7 @@ export const Hero: React.FC = () => {
           </div>
 
           {/* Right Column: Medium-Small Portrait in Clean Modern Frame */}
-          <div className="hero-portrait-companion">
+          <div className="hero-portrait-companion reveal-item reveal-delay-2">
             <div className="portrait-modern-frame">
               {/* Subtle Minimal Corner Accent */}
               <div className="portrait-frame-accent" aria-hidden="true">

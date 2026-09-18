@@ -2,7 +2,6 @@ import React from 'react';
 import { GitHubIcon } from './Icons';
 import { IHeartVisual } from './IHeartVisual';
 import { SKILL_PROJECT_MAP } from '../data/skills';
-import { useTargetPetals, CardPetalsLayer } from './SectionPetals';
 
 interface IHeartFlagshipProps {
   activeTech: string | null;
@@ -22,7 +21,6 @@ export const IHeartFlagship: React.FC<IHeartFlagshipProps> = ({
   activeTech,
   onOpenDetails,
 }) => {
-  const { activePetals, touchProps } = useTargetPetals();
   const isHighlighted = activeTech
     ? (SKILL_PROJECT_MAP[activeTech]?.includes('I-HEART') ||
        IHEART_TECHS.some((t) => t.toLowerCase() === activeTech.toLowerCase()))
@@ -42,10 +40,7 @@ export const IHeartFlagship: React.FC<IHeartFlagshipProps> = ({
           onOpenDetails?.();
         }
       }}
-      style={{ position: 'relative' }}
-      {...touchProps}
     >
-      <CardPetalsLayer petals={activePetals} />
       {/* Compact Top Header Bar */}
       <div className="flagship-compact-top-bar">
         <div className="flagship-top-left">
