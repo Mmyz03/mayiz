@@ -15,10 +15,8 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
   onClose,
 }) => {
   const [activeProject, setActiveProject] = useState<ProjectDetail | null>(project);
-  const [isOpen, setIsOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const closeTimerRef = useRef<number | null>(null);
-  const openRafRef = useRef<number | null>(null);
   const backdropRef = useRef<HTMLDivElement>(null);
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
@@ -40,7 +38,6 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
 
     // 2. Set closing state
     setIsClosing(true);
-    setIsOpen(false);
 
     // 3. Immediately notify parent to reset selected project state so re-clicking the same project works instantly
     onCloseRef.current();
@@ -73,16 +70,6 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
       if (backdropRef.current) {
         backdropRef.current.scrollTop = 0;
       }
-
-      // Double rAF ensures the browser renders the initial resting state before initiating transition
-      if (openRafRef.current) {
-        cancelAnimationFrame(openRafRef.current);
-      }
-      openRafRef.current = requestAnimationFrame(() => {
-        openRafRef.current = requestAnimationFrame(() => {
-          setIsOpen(true);
-        });
-      });
     } else if (activeProject && !isClosing) {
       triggerClose();
     }
@@ -90,7 +77,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
 
   // Escape key handler
   useEffect(() => {
-    if (!isOpen || isClosing) return;
+    if (!activeProject || isClosing) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -102,7 +89,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isOpen, isClosing, triggerClose]);
+  }, [activeProject, isClosing, triggerClose]);
 
   // Clean up on unmount
   useEffect(() => {
@@ -110,16 +97,13 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
       if (closeTimerRef.current) {
         clearTimeout(closeTimerRef.current);
       }
-      if (openRafRef.current) {
-        cancelAnimationFrame(openRafRef.current);
-      }
       unlockBodyScroll();
     };
   }, []);
 
   if (!activeProject) return null;
 
-  const stateClass = isClosing ? 'is-closing' : isOpen ? 'is-open' : 'is-opening';
+  const stateClass = isClosing ? 'is-closing' : 'is-open';
 
   return (
     <div

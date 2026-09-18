@@ -2065,19 +2065,16 @@ a {
   opacity: 0;
   pointer-events: none;
   transform: translateZ(0);
-  will-change: opacity;
-  transition: opacity 0.80s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .project-modal-backdrop.is-open {
-  opacity: 1;
   pointer-events: auto;
+  animation: modalBackdropFadeIn 0.80s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .project-modal-backdrop.is-closing {
-  opacity: 0;
   pointer-events: none !important;
-  transition: opacity 0.80s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: modalBackdropFadeOut 0.80s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .project-modal-backdrop.is-closing * {
@@ -2099,21 +2096,14 @@ a {
   transform-origin: center center;
   opacity: 0;
   will-change: transform, opacity;
-  transition: transform 0.80s cubic-bezier(0.22, 1, 0.36, 1),
-              opacity 0.80s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .project-modal-backdrop.is-open .project-modal-container {
-  transform: translate3d(0, 0, 0) scale(1) translateZ(0);
-  opacity: 1;
+  animation: modalContainerExpand 0.80s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .project-modal-backdrop.is-closing .project-modal-container {
-  transform: translate3d(0, 14px, 0) scale(0.975) translateZ(0);
-  opacity: 0;
-  pointer-events: none !important;
-  transition: transform 0.80s cubic-bezier(0.22, 1, 0.36, 1),
-              opacity 0.80s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: modalContainerContract 0.80s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 /* Staggered Inner Content Reveal on Open, Gentle Dissolve on Close */
@@ -2122,22 +2112,79 @@ a {
   transform: translate3d(0, 8px, 0);
   opacity: 0;
   will-change: transform, opacity;
-  transition: transform 0.54s cubic-bezier(0.22, 1, 0.36, 1) 0.14s,
-              opacity 0.54s cubic-bezier(0.22, 1, 0.36, 1) 0.14s;
 }
 
 .project-modal-backdrop.is-open .project-modal-body,
 .project-modal-backdrop.is-open .project-modal-footer {
-  transform: translate3d(0, 0, 0);
-  opacity: 1;
+  animation: modalContentFadeSlideIn 0.54s cubic-bezier(0.22, 1, 0.36, 1) 0.14s both;
 }
 
 .project-modal-backdrop.is-closing .project-modal-body,
 .project-modal-backdrop.is-closing .project-modal-footer {
-  transform: translate3d(0, 8px, 0);
-  opacity: 0;
-  transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1) 0s,
-              opacity 0.38s cubic-bezier(0.22, 1, 0.36, 1) 0s;
+  animation: modalContentFadeSlideOut 0.38s cubic-bezier(0.22, 1, 0.36, 1) 0s forwards;
+}
+
+/* Keyframe Definitions for 100% Reliable First-Mount Transitions */
+@keyframes modalBackdropFadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes modalBackdropFadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes modalContainerExpand {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0) scale(0.975) translateZ(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1) translateZ(0);
+  }
+}
+
+@keyframes modalContainerContract {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1) translateZ(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0) scale(0.975) translateZ(0);
+  }
+}
+
+@keyframes modalContentFadeSlideIn {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes modalContentFadeSlideOut {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0);
+  }
 }
 
 .project-modal-header {
@@ -2303,9 +2350,19 @@ a {
   }
 
   .project-modal-backdrop,
+  .project-modal-backdrop.is-open,
+  .project-modal-backdrop.is-closing,
   .project-modal-container,
+  .project-modal-backdrop.is-open .project-modal-container,
+  .project-modal-backdrop.is-closing .project-modal-container,
   .project-modal-body,
-  .project-modal-footer {
+  .project-modal-footer,
+  .project-modal-backdrop.is-open .project-modal-body,
+  .project-modal-backdrop.is-open .project-modal-footer,
+  .project-modal-backdrop.is-closing .project-modal-body,
+  .project-modal-backdrop.is-closing .project-modal-footer {
+    animation-duration: 0.01s !important;
+    animation-delay: 0s !important;
     transition-duration: 0.01s !important;
     transition-delay: 0s !important;
   }
