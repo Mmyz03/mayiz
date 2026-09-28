@@ -70,7 +70,7 @@ export const Hero: React.FC = () => {
               {/* Photo Container */}
               <div className="portrait-photo-container">
                 <img
-                  src="/mayiz-portrait.jpg"
+                  src="/myz-portfolio-pic-1.png"
                   alt="Mohammed Mayiz Mohtesham"
                   className="hero-portrait-img"
                   loading="lazy"
