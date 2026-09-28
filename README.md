@@ -37,4 +37,3 @@ Personal portfolio website showcasing my work, projects, skills, and journey as 
 
 * **Email:** [mohammadmayiz9060@gmail.com](mailto:mohammadmayiz9060@gmail.com)
 * **LinkedIn:** [Mohammed Mayiz on LinkedIn](https://www.linkedin.com/in/mohammed-mayiz-mohtesham-800a6237a/?utm_source=chatgpt.com)
-* **GitHub:** [Mmyz03](https://github.com/Mmyz03?utm_source=chatgpt.com)
